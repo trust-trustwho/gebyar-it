@@ -1,5 +1,4 @@
 /* SkillFE Works Wheel. Transparent surfaces retain the existing SE aurora. */
-.se-mobile-projects { display: none; }
 .se-work-scroll { position: relative; height: 650svh; overflow-anchor: none; }
 .se-work-sticky { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; padding-top: 24px; box-sizing: border-box; }
 .se-work-sticky .se-section-heading { flex: 0 0 auto; gap: 12px; margin-bottom: 8px; }

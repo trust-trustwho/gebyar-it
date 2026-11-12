@@ -44,20 +44,21 @@ export function initSEPlayground(root) {
     const vh = innerHeight;
     const progress = Math.max(0,Math.min(1, -rect.top / Math.max(1,rect.height-vh)));
     const still = compact.matches || reduce.matches;
+    const mobileParallax = compact.matches && !reduce.matches;
     // Different travel distances/directions give the two columns independent depth.
     columns[0].style.transform = still ? 'none' : `translate3d(0,${-progress*vh*.52}px,0)`;
     columns[1].style.transform = still ? 'none' : `translate3d(0,${progress*vh*.3}px,0)`;
+    columns[0].style.translate = mobileParallax ? `0 ${-progress * vh * .52}px` : '';
+    columns[1].style.translate = mobileParallax ? `0 ${progress * vh * .3}px` : '';
     cards.forEach((card,i) => {
       const tilt = Math.sin(progress*Math.PI) * (i%2 ? 3 : -3);
-      card.style.transform = still ? 'none' : `rotate(${tilt}deg)`;
+      card.style.transform = reduce.matches ? 'none' : `rotate(${tilt}deg)`;
     });
   }
   function schedule() {
     if (!queued && root.classList.contains('is-active')) { queued = true; requestAnimationFrame(render); }
   }
-  window.addEventListener('scroll', () => {
-    if (!compact.matches) schedule();
-  }, { passive: true });
+  window.addEventListener('scroll',schedule,{passive:true});
   window.addEventListener('resize',schedule,{passive:true});
   compact.addEventListener('change',schedule);
   reduce.addEventListener('change',schedule);

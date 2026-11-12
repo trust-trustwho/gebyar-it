@@ -81,14 +81,7 @@ export function renderSEWorksWheel(products, { code = 'SE', label = 'PRODUK LAB 
       <div class="se-wheel-label"><span>${label}</span><p>${subtitle}<br><em>${accent}</em></p></div>
       <div class="se-wheel-project" aria-live="polite" aria-atomic="true"><span class="se-wheel-project-count">01 / 05</span><h3>${products[0].name}</h3><p>${products[0].type}</p></div>
     </div>
-  </div>
-  <ul class="se-mobile-projects" aria-label="${label}" tabindex="0">
-    ${products.map(product => `<li>
-      <img src="${product.src || siteUrl(`/assets/se/${product.image}.webp`)}" alt="${product.alt || ''}" loading="lazy" decoding="async" draggable="false">
-      <h3>${product.name}</h3>
-      <p>${product.type}</p>
-    </li>`).join('')}
-  </ul>`;
+  </div>`;
 }
 
 export function initSEWorksWheel(root, products) {
@@ -109,7 +102,6 @@ export function initSEWorksWheel(root, products) {
   const projectCount = project.querySelector('.se-wheel-project-count');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const compact = matchMedia('(max-width: 640px)');
-  const mobile = matchMedia('(max-width: 680px)');
   const count = products.length;
   let turn = 0, target = 0, active = -1, frame = 0, visible = false;
   let velocity = 0, previousTime = 0;
@@ -117,10 +109,6 @@ export function initSEWorksWheel(root, products) {
   let metrics = null, drag = null;
 
   function measure() {
-    if (mobile.matches) {
-      runway.style.height = '';
-      return;
-    }
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
     scrollStep = Math.max(480,panel.clientHeight*.78);
@@ -147,7 +135,7 @@ export function initSEWorksWheel(root, products) {
   }
   function draw(time) {
     frame = 0;
-    if (mobile.matches || !metrics || !visible || !root.classList.contains('is-active')) return;
+    if (!metrics || !visible || !root.classList.contains('is-active')) return;
     target = scrollTurn();
     const dt = previousTime ? clamp((time-previousTime)/1000,1/240,1/30) : 1/60;
     previousTime = time;
@@ -199,7 +187,7 @@ export function initSEWorksWheel(root, products) {
     if (moving) requestDraw();
     else previousTime = 0;
   }
-  function requestDraw() { if (!mobile.matches && !frame && visible && root.classList.contains('is-active')) frame=requestAnimationFrame(draw); }
+  function requestDraw() { if (!frame && visible && root.classList.contains('is-active')) frame=requestAnimationFrame(draw); }
   function scrollTurn() {
     const chapter = clamp((scrollY-scrollStart)/scrollStep,0,count+2);
     return turnFromChapter(chapter,count);
@@ -261,6 +249,5 @@ export function initSEWorksWheel(root, products) {
   }).observe(root,{attributes:true,attributeFilter:['class']});
   reduce.addEventListener('change',()=>{ turn=target; velocity=0; requestDraw(); });
   compact.addEventListener('change',measure);
-  mobile.addEventListener('change', measure);
   measure();
 }
