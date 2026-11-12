@@ -1,0 +1,129 @@
+/* FAQ Pro utilities only; the existing site's reset and background stay intact. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) important source(none);
+@source "./components/ui/faq-pro.tsx";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme inline {
+  --color-foreground: var(--ic-foreground);
+  --color-muted: var(--ic-muted);
+  --color-muted-foreground: var(--ic-muted-foreground);
+  --color-card: var(--ic-card);
+  --color-border: var(--ic-border);
+  --color-accent: var(--ic-accent);
+  --color-ring: var(--ic-ring);
+}
+
+/* Supply the reset assumptions of the original component locally. */
+[data-se-faq] input { border-style: solid; }
+[data-se-faq] svg { display: block; vertical-align: middle; }
+.se-faq-about { margin-top: 24px; }
+
+/* Liquid Glass skin for SE only; FAQ Pro keeps its original behavior/demo. */
+@layer utilities {
+.se-faq-glass.se-faq-glass {
+  --ic-foreground: #171c1e !important;
+  --ic-card: transparent !important;
+  --ic-muted: transparent !important;
+  --ic-muted-foreground: #4b575b !important;
+  --ic-border: rgb(255 255 255 / 55%) !important;
+  --ic-accent: rgb(255 255 255 / 16%) !important;
+  --ic-ring: rgb(23 28 30 / 40%) !important;
+}
+
+.se-faq-glass > [data-faq-search],
+.se-faq-glass > [data-faq-list] > div > div {
+  position: relative;
+  isolation: isolate;
+  background: rgb(255 255 255 / 1%) !important;
+  background-blend-mode: luminosity;
+  border: none;
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 90%),
+    inset 1px 0 1px rgb(255 255 255 / 45%),
+    inset 0 -1px 2px rgb(28 62 70 / 18%),
+    inset 0 0 10px rgb(255 255 255 / 18%),
+    0 4px 6px rgb(28 62 70 / 4%),
+    0 12px 28px rgb(28 62 70 / 9%);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.se-faq-glass > [data-faq-search] { border-radius: 999px; }
+
+.se-faq-glass > [data-faq-search]::before,
+.se-faq-glass > [data-faq-list] > div > div::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgb(255 255 255 / 95%) 0%, rgb(255 255 255 / 45%) 20%,
+    rgb(255 255 255 / 0%) 40%, rgb(255 255 255 / 0%) 60%,
+    rgb(255 255 255 / 45%) 80%, rgb(255 255 255 / 90%) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* A restrained surface reflection makes the bevel visible on the light aurora. */
+.se-faq-glass > [data-faq-list] > div > div::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+    rgb(255 255 255 / 34%) 0%, rgb(255 255 255 / 7%) 30%,
+    transparent 47%, rgb(255 255 255 / 18%) 70%, transparent 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.se-faq-glass input {
+  background: transparent !important;
+  border-color: transparent !important;
+  caret-color: #171c1e;
+}
+
+.se-faq-glass > [data-faq-search]:focus-within {
+  outline: 1px solid rgb(255 255 255 / 55%);
+  outline-offset: 3px;
+}
+
+.se-faq-glass > [data-faq-list] > div > div {
+  transition: background-color 300ms ease, box-shadow 300ms ease,
+    transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.se-faq-glass > [data-faq-list] > div > div:hover,
+.se-faq-glass > [data-faq-list] > div > div:has([aria-expanded="true"]) {
+  background: rgb(255 255 255 / 4%) !important;
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 100%),
+    inset 1px 0 2px rgb(255 255 255 / 65%),
+    inset 0 -1px 2px rgb(28 62 70 / 22%),
+    inset 0 0 14px rgb(255 255 255 / 24%),
+    0 6px 10px rgb(28 62 70 / 5%),
+    0 16px 32px rgb(28 62 70 / 12%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .se-faq-glass > [data-faq-list] > div > div:hover { transform: scale(1.01); }
+  .se-faq-glass > [data-faq-list] > div > div:has(> button:active) { transform: scale(0.99); }
+}
+
+.se-faq-glass mark {
+  background: rgb(251 191 36 / 28%) !important;
+  color: #171c1e !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-faq-glass > [data-faq-list] > div > div {
+    transition: none;
+    transform: none !important;
+  }
+}
+}

@@ -1,0 +1,31 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "./components/ui/typewriter-text.tsx";
+@source "./components/ui/typewriter-text-demo.tsx";
+@source "./hero-welcome.tsx";
+
+.hero-welcome {
+  position: absolute;
+  inset: 126px auto auto clamp(16px, 4vw, 36px);
+  z-index: 11;
+  max-width: calc(100% - 32px);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(15px, 1.55vw, 22px);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  text-shadow: 0 1px 8px rgb(255 255 255 / 75%);
+  pointer-events: none;
+}
+
+.hero-welcome p { margin: 0; white-space: pre-line; }
+
+@media (max-width: 680px) {
+  .hero-welcome { top: 172px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-welcome .animate-pulse { animation: none; }
+}

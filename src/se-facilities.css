@@ -1,0 +1,87 @@
+.curved-carousel-stage.se-facilities-carousel {
+  height: clamp(368px, 37vw, 455px);
+  margin: 0;
+  touch-action: pan-y;
+}
+
+.se-facilities-carousel .se-facilities-panel {
+  cursor: inherit;
+}
+
+.se-facilities-carousel .curved-carousel-track {
+  --edge-fade: clamp(44px, 15%, 168px);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    rgb(0 0 0 / 10%) calc(var(--edge-fade) * 0.2),
+    rgb(0 0 0 / 35%) calc(var(--edge-fade) * 0.4),
+    rgb(0 0 0 / 65%) calc(var(--edge-fade) * 0.6),
+    rgb(0 0 0 / 90%) calc(var(--edge-fade) * 0.8),
+    black var(--edge-fade),
+    black calc(100% - var(--edge-fade)),
+    rgb(0 0 0 / 90%) calc(100% - var(--edge-fade) * 0.8),
+    rgb(0 0 0 / 65%) calc(100% - var(--edge-fade) * 0.6),
+    rgb(0 0 0 / 35%) calc(100% - var(--edge-fade) * 0.4),
+    rgb(0 0 0 / 10%) calc(100% - var(--edge-fade) * 0.2),
+    transparent
+  );
+}
+
+.se-facilities-carousel:focus-visible {
+  outline: 2px solid #6d9e75;
+  outline-offset: 4px;
+}
+
+.se-facilities-panel {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: #e4e9e2;
+  color: white;
+  cursor: zoom-in;
+  text-align: left;
+}
+
+.se-facilities-panel img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.se-facilities-control:focus-visible { outline: 2px solid #6d9e75; outline-offset: 3px; }
+
+.se-facilities-dialog[open] {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 56px 16px 12px;
+  border: 0;
+  background: transparent;
+  color: white;
+  overscroll-behavior: contain;
+}
+.se-facilities-dialog::backdrop { background: rgb(9 14 11 / 95%); }
+.se-facilities-view { width: min(100%, 1024px); }
+.se-facilities-frame { position: relative; height: min(66dvh, 660px); pointer-events: none; }
+.se-facilities-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.se-facilities-navigation { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px; font-size: .875rem; }
+.se-facilities-control {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 10%);
+  color: white;
+  cursor: pointer;
+}
+.se-facilities-control:hover { background: rgb(255 255 255 / 22%); }
+.se-facilities-close { position: absolute; top: 12px; right: 16px; }

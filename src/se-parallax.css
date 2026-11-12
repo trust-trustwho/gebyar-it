@@ -1,0 +1,16 @@
+.se-depth-heading { display: block; }
+h2[data-home-reveal] > .se-depth-heading { font-family: inherit; }
+.se-parallax-active .se-hero-title,
+.se-parallax-active .se-hero-motto,
+.se-parallax-active .se-hero-subtitle,
+.se-parallax-active .se-hero-actions,
+.se-parallax-active .se-depth-heading { will-change: transform; }
+.se-parallax-active .se-hero-content { will-change: transform, opacity; }
+
+/* The pill already reveals this hero. Replaying its fade would blank the
+   aperture or restart the entrance when switching from fixed to page layout. */
+.se-hero-wrapper.se-hero-revealed { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-page-se .se-hero-wrapper, .lab-page-csn .se-hero-wrapper, .lab-page-git .se-hero-wrapper, .lab-page-keris .se-hero-wrapper { animation: none; }
+}

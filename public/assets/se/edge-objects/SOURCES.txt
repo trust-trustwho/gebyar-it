@@ -1,0 +1,39 @@
+Software Engineering edge decoration
+
+Mechanical Keyboard
+https://grab3d.com/models/electronics/keyboard/
+Transparent render: https://grab3d.com/m/keyboard/keyboard-3d-model.webp
+
+Laptop
+https://grab3d.com/models/electronics/laptop/
+Transparent render: https://grab3d.com/m/laptop/laptop-3d-model.webp
+
+Both assets were discovered and their model licences checked through
+Local Design Tools / 3D Asset Server. Licence reported by the provider: CC0.
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The original transparent renders are stored unmodified. The page applies
+mint colour grading with CSS filters and animates their surrounding elements.
+
+Custom software engineering renders
+code.webp, git.webp, database.webp, interface.webp, quality.webp, modules.webp
+
+Rendered locally with Three.js in a coordinated mint/ivory material palette.
+Code, Git and quality assurance contours use Phosphor Icons, retrieved through
+Local Design Tools / Better Icons. Database, UI panels and module cubes are
+custom procedural geometry. Icon identifiers used as source/reference:
+ph:code-bold, ph:git-branch-bold, ph:database-bold, ph:browser-bold,
+ph:shield-check-bold, ph:cube-bold.
+https://github.com/phosphor-icons/core
+Phosphor Icons copyright (c) 2023 Phosphor Icons, MIT licence.
+The complete licence is included in PHOSPHOR-LICENSE.txt.
+
+interface.webp refined composition
+Custom layered app window with a translucent backing, ivory front panel,
+mint orbital preview, capsule button and floating code badge. The badge uses
+the same Phosphor code contour and licence listed above.
+
+monitor.webp
+Custom procedural 3D monitor with a mint frame, ivory stand and a code-editor
+screen texture drawn locally. Decorative TypeScript/React sample, file explorer,
+line numbers and syntax colours are part of the original screen illustration.

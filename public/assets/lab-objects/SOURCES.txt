@@ -1,0 +1,27 @@
+Laboratory background objects
+
+Original transparent 800x600 WebP renders in three coordinated palettes.
+Rendered locally with Three.js. The website serves the images directly.
+
+CSN / blue and white
+router, server and topology use custom procedural geometry.
+cloud and shield use extruded Phosphor Icons contours.
+
+GIT / amber and ivory
+globe, folded map and satellite use custom procedural geometry.
+pin and compass use extruded Phosphor Icons contours.
+
+KERIS / lavender and white
+chip, knowledge graph, layers and robot use custom procedural geometry.
+brain uses an extruded Phosphor Icons contour.
+
+Source icons retrieved through Local Design Tools / Better Icons:
+ph:cloud-bold, ph:shield-check-bold, ph:map-pin-bold,
+ph:compass-bold, ph:brain-bold.
+https://github.com/phosphor-icons/core
+Copyright (c) 2023 Phosphor Icons. MIT licence.
+The complete licence is included in PHOSPHOR-LICENSE.txt.
+
+Faculty checkmark variants
+csn/quality.webp, git/quality.webp and keris/quality.webp use the same custom
+shield-check composition as SE, rendered with each laboratory's palette.
