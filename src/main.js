@@ -2772,16 +2772,24 @@ handleInitialRoute();
 
 // Global scroll-up detection when user is inside an active laboratory section to reverse zoom transition
 let lastTouchY = 0;
+let startTouchX = 0;
 let isTouchActive = false;
+let mobileReverseGesture = false;
 
 window.addEventListener('touchstart', (e) => {
   if (e.touches && e.touches.length > 0) {
     lastTouchY = e.touches[0].clientY;
+    startTouchX = e.touches[0].clientX;
     isTouchActive = true;
+    mobileReverseGesture = Boolean(labOpenedFromQuiz && window.scrollY <= 4 && e.touches.length === 1);
   }
 }, { passive: true });
 
 window.addEventListener('touchend', () => {
+  isTouchActive = false;
+}, { passive: true });
+
+window.addEventListener('touchcancel', () => {
   isTouchActive = false;
 }, { passive: true });
 
@@ -2814,7 +2822,13 @@ window.addEventListener('touchmove', (e) => {
   if (isTouchActive && e.touches && e.touches.length > 0) {
     const currentY = e.touches[0].clientY;
     const deltaY = currentY - lastTouchY; // positive = dragging finger downwards = scrolling page up
-    if (deltaY > 20) {
+    if (mobileHeaderLayout.matches) {
+      const deltaX = Math.abs(e.touches[0].clientX - startTouchX);
+      if (mobileReverseGesture && e.touches.length === 1 && deltaY > 52 && deltaY > deltaX * 2) {
+        mobileReverseGesture = false;
+        handleLabScrollUpIntent(e);
+      }
+    } else if (deltaY > 20) {
       handleLabScrollUpIntent(e);
     }
   }

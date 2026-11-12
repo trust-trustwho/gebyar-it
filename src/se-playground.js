@@ -34,24 +34,19 @@ export function initSEPlayground(root) {
   section.dataset.playgroundReady = 'true';
   const columns = [...section.querySelectorAll('.se-play-column')];
   const cards = [...section.querySelectorAll('.se-play-card')];
-  const stage = section.querySelector('.se-play-stage');
   const compact = matchMedia('(max-width: 680px)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   let queued = false;
-  let visible = false;
   function render() {
     queued = false;
     if (!root.classList.contains('is-active')) return;
     const rect = section.getBoundingClientRect();
-    const vh = compact.matches && !reduce.matches ? stage.clientHeight : innerHeight;
+    const vh = innerHeight;
     const progress = Math.max(0,Math.min(1, -rect.top / Math.max(1,rect.height-vh)));
     const still = compact.matches || reduce.matches;
-    const mobileParallax = compact.matches && !reduce.matches;
     // Different travel distances/directions give the two columns independent depth.
     columns[0].style.transform = still ? 'none' : `translate3d(0,${-progress*vh*.52}px,0)`;
     columns[1].style.transform = still ? 'none' : `translate3d(0,${progress*vh*.3}px,0)`;
-    columns[0].style.translate = mobileParallax ? `0 ${-progress * vh * .52}px` : '';
-    columns[1].style.translate = mobileParallax ? `0 ${progress * vh * .3}px` : '';
     cards.forEach((card,i) => {
       const tilt = Math.sin(progress*Math.PI) * (i%2 ? 3 : -3);
       card.style.transform = still ? 'none' : `rotate(${tilt}deg)`;
@@ -61,12 +56,8 @@ export function initSEPlayground(root) {
     if (!queued && root.classList.contains('is-active')) { queued = true; requestAnimationFrame(render); }
   }
   window.addEventListener('scroll', () => {
-    if (!compact.matches || visible) schedule();
+    if (!compact.matches) schedule();
   }, { passive: true });
-  new IntersectionObserver(([entry]) => {
-    visible = entry.isIntersecting;
-    if (visible && compact.matches) schedule();
-  }, { rootMargin: '100px' }).observe(section);
   window.addEventListener('resize',schedule,{passive:true});
   compact.addEventListener('change',schedule);
   reduce.addEventListener('change',schedule);
