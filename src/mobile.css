@@ -455,6 +455,11 @@
   }
 
   .lab-detail-page .se-block { padding-inline: var(--mobile-gutter); }
+  .lab-detail-page :is(.org-card, .se-hero-back-link, .se-btn-liquid, .se-faculty-copy) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .lab-detail-page .se-play-card { will-change: auto; }
   .lab-detail-page .curved-carousel-stage.se-facilities-carousel {
     height: clamp(190px, 65vw, 292px);
   }
@@ -485,7 +490,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-height: 245svh;
-    padding-block: 0 calc(30vh + 24px);
+    padding-block: 0 calc(30svh + 24px);
   }
 
   .lab-detail-page .se-playground :is(.se-play-stage, .se-play-columns) {

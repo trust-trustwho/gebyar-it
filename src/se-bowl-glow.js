@@ -156,18 +156,28 @@ export function initSEBowlGlow(root) {
   const paint = createPainter(canvas);
   if (!paint) return;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = matchMedia('(max-width: 680px)');
   let visible = false;
   let frameId = 0;
   let began = null;
   let zoomStartedAt = null;
   let lastPaint = null;
   let current = rest;
+  let mobileAspect = null;
 
   const aspect = () => (canvas.clientWidth || innerWidth) / (canvas.clientHeight || innerHeight);
   function reset() {
     current = rest;
     canvas.style.transform = '';
     const entering = root.dataset.seEntryTransition === 'zoom-in' && !motion.matches;
+    if (mobile.matches) {
+      const nextAspect = entering ? previewAspect : aspect();
+      if (mobileAspect !== nextAspect) {
+        paint(rest, nextAspect);
+        mobileAspect = nextAspect;
+      }
+      return;
+    }
     zoomStartedAt = entering ? performance.now() : null;
     if (entering) began = zoomStartedAt - 1300;
     paint(rest, entering ? previewAspect : aspect());
@@ -178,7 +188,7 @@ export function initSEBowlGlow(root) {
   function frame(now) {
     frameId = 0;
     const transition = root.dataset.seEntryTransition;
-    if (!visible || document.hidden || motion.matches || transition === 'zoom-out') return;
+    if (!visible || document.hidden || motion.matches || mobile.matches || transition === 'zoom-out') return;
 
     began ??= now;
     const elapsed = now - began;
@@ -211,7 +221,7 @@ export function initSEBowlGlow(root) {
     cancelAnimationFrame(frameId);
     frameId = 0;
     if (!visible || document.hidden) return;
-    if (motion.matches) reset();
+    if (motion.matches || mobile.matches) reset();
     else if (root.dataset.seEntryTransition !== 'zoom-out') frameId = requestAnimationFrame(frame);
   }
 
@@ -221,6 +231,10 @@ export function initSEBowlGlow(root) {
   }).observe(hero);
   new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-se-entry-transition'] });
   motion.addEventListener('change', sync);
-  window.addEventListener('resize', () => { if (visible && motion.matches) reset(); });
+  mobile.addEventListener('change', () => {
+    mobileAspect = null;
+    sync();
+  });
+  window.addEventListener('resize', () => { if (visible && (motion.matches || mobile.matches)) reset(); });
   document.addEventListener('visibilitychange', sync);
 }
