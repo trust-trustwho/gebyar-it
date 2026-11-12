@@ -540,6 +540,8 @@ let lastZoomedLab = 'se';
 let lastZoomedLabInfo = null;
 let lastResultScrollY = 0;
 let isZoomingTransition = false;
+let labOpenedFromQuiz = false;
+let restartLabMatcherQuiz;
 
 // Navigation Index Mapping for SkillFE Liquid Glass Navbar (in order of page flow)
 const LAB_NAV_INDEX_MAP = {
@@ -1190,7 +1192,7 @@ function renderLabDetailContent(sectionEl, labId) {
     const [renderSections, initSections] = sectionTools;
     sectionEl.querySelector('.lab-detail-page').insertAdjacentHTML('beforeend', renderSections());
     const createCarousel = (stage, track, empty, options) => new CurvedCarousel(stage, track, empty, options);
-    initSections(sectionEl, () => activateLabView('hero', true), lab => void navigateFromLabFooter(sectionEl, lab), createCarousel);
+    initSections(sectionEl, returnFromLab, lab => void navigateFromLabFooter(sectionEl, lab), createCarousel);
 
     bindLabHomeLinks(sectionEl, labId);
 
@@ -1241,15 +1243,26 @@ function bindLabHomeLinks(sectionEl, labId) {
     link.addEventListener('click', event => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      activateLabView('hero', true, { immediate: true });
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.getElementById('hero')?.animate(
-          [{ opacity: 0 }, { opacity: 1 }],
-          { duration: 480, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
-        );
-      }
+      returnFromLab();
     });
   });
+}
+
+function returnFromLab() {
+  if (isZoomingTransition) return;
+  if (labOpenedFromQuiz) {
+    restartLabMatcherQuiz();
+    activateLabView('quiz', true, { immediate: true });
+    return;
+  }
+
+  activateLabView('hero', true, { immediate: true });
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.getElementById('hero')?.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: 480, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+    );
+  }
 }
 
 /**
@@ -1385,6 +1398,7 @@ function executePillZoomToLab(pillEl, labInfo, onComplete) {
 
   const finish = (animations = []) => {
     activateLabView(targetLabId, true);
+    labOpenedFromQuiz = true;
 
     targetSection.style.position = '';
     targetSection.style.top = '';
@@ -1687,6 +1701,7 @@ function executePillZoomOutFromLab(onComplete) {
         }
 
         currentActiveLab = null;
+        labOpenedFromQuiz = false;
         isZoomingTransition = false;
         liquidNavInstance?.setActiveIndex(LAB_NAV_INDEX_MAP.quiz);
         const headerEl = document.querySelector('.neural-header');
@@ -1711,6 +1726,21 @@ function initLabMatcherQuiz() {
   let currentStep = 0;
   let cleanupStickyEngine;
   const userAnswers = [];
+  const quizSection = document.getElementById('quiz');
+
+  restartLabMatcherQuiz = () => {
+    cleanupStickyEngine?.();
+    cleanupStickyEngine = null;
+    quizSection.classList.remove('is-result-sticky');
+    quizSection.querySelector('.matcher-sticky-wrapper')?.classList.remove('is-zoom-locked');
+    delete window.__pillAnimGroup;
+    delete window.__onReverseZoomOutComplete;
+    labOpenedFromQuiz = false;
+    lastResultScrollY = 0;
+    userAnswers.length = 0;
+    currentStep = 0;
+    renderQuestion(currentStep);
+  };
 
   function renderQuestion(stepIndex) {
     const q = QUIZ_QUESTIONS[stepIndex];
@@ -2124,14 +2154,8 @@ function initLabMatcherQuiz() {
     const resetBtn = document.getElementById('resetQuizBtn');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        cleanupStickyEngine();
-        cleanupStickyEngine = null;
-        if (quizSection) quizSection.classList.remove('is-result-sticky');
-        hasZoomed = false;
-        autoZoomTriggered = false;
-        userAnswers.length = 0;
-        currentStep = 0;
-        renderQuestion(currentStep);
+        restartLabMatcherQuiz();
+        quizSection.scrollIntoView({ behavior: 'instant' });
       });
     }
   }
