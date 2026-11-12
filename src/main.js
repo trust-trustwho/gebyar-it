@@ -1252,8 +1252,6 @@ function returnFromLab() {
   if (isZoomingTransition) return;
   if (labOpenedFromQuiz) {
     restartLabMatcherQuiz();
-    activateLabView('quiz', true, { immediate: true });
-    return;
   }
 
   activateLabView('hero', true, { immediate: true });
