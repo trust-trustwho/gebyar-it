@@ -303,6 +303,9 @@
     height: var(--career-card-height);
     margin-left: calc(var(--career-card-width) / -2);
     border-radius: 18px;
+    background: #fff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   #karir .fan-card-inner {
@@ -331,6 +334,10 @@
     margin: 0;
     font-size: 10px;
     line-height: 1.3;
+  }
+
+  #karir :is(.trajectory-label, .salary-lbl, .trajectory-step:not(.is-current) .step-num) {
+    color: #54545c;
   }
 
   #karir .fan-salary-box {
