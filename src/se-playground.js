@@ -34,14 +34,16 @@ export function initSEPlayground(root) {
   section.dataset.playgroundReady = 'true';
   const columns = [...section.querySelectorAll('.se-play-column')];
   const cards = [...section.querySelectorAll('.se-play-card')];
+  const stage = section.querySelector('.se-play-stage');
   const compact = matchMedia('(max-width: 680px)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   let queued = false;
+  let nearViewport = false;
   function render() {
     queued = false;
     if (!root.classList.contains('is-active')) return;
     const rect = section.getBoundingClientRect();
-    const vh = innerHeight;
+    const vh = compact.matches && !reduce.matches ? stage.clientHeight : innerHeight;
     const progress = Math.max(0,Math.min(1, -rect.top / Math.max(1,rect.height-vh)));
     const still = compact.matches || reduce.matches;
     const mobileParallax = compact.matches && !reduce.matches;
@@ -58,7 +60,13 @@ export function initSEPlayground(root) {
   function schedule() {
     if (!queued && root.classList.contains('is-active')) { queued = true; requestAnimationFrame(render); }
   }
-  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('scroll', () => {
+    if (!compact.matches || nearViewport) schedule();
+  }, { passive: true });
+  new IntersectionObserver(([entry]) => {
+    nearViewport = entry.isIntersecting;
+    if (nearViewport && compact.matches) schedule();
+  }, { rootMargin: '160px' }).observe(section);
   window.addEventListener('resize',schedule,{passive:true});
   compact.addEventListener('change',schedule);
   reduce.addEventListener('change',schedule);

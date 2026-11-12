@@ -60,6 +60,7 @@ export function initSEParallax(root) {
   initSEBowlGlow(root);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const compact = matchMedia('(max-width: 767px)');
+  const mobile = matchMedia('(max-width: 680px)');
   let context = null;
   let tick = null;
   let refreshFrame = 0;
@@ -90,20 +91,24 @@ export function initSEParallax(root) {
     activeController?.stop();
     activeController = controller;
     page.classList.add('se-parallax-active');
-    const lenis = new Lenis({
-      autoRaf: false,
-      duration: 1.2,
-      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-      syncTouch: false,
-      anchors: false,
-    });
-    controller.lenis = lenis;
-    lenis.on('scroll', ScrollTrigger.update);
-    tick = time => lenis.raf(time * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+    // ScrollTrigger already listens to native scrolling. On phones it can
+    // keep the same timeline without running Lenis on every animation frame.
+    if (!mobile.matches) {
+      const lenis = new Lenis({
+        autoRaf: false,
+        duration: 1.2,
+        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: true,
+        syncTouch: false,
+        anchors: false,
+      });
+      controller.lenis = lenis;
+      lenis.on('scroll', ScrollTrigger.update);
+      tick = time => lenis.raf(time * 1000);
+      gsap.ticker.add(tick);
+      gsap.ticker.lagSmoothing(0);
+    }
 
     context = gsap.context(() => {
       const depth = compact.matches ? .55 : 1;
@@ -150,7 +155,7 @@ export function initSEParallax(root) {
       if (refreshFrame) cancelAnimationFrame(refreshFrame);
       refreshFrame = requestAnimationFrame(() => {
         refreshFrame = 0;
-        lenis.resize();
+        controller.lenis?.resize();
         ScrollTrigger.refresh();
       });
     });
@@ -175,5 +180,6 @@ export function initSEParallax(root) {
   }).observe(root, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'data-se-entry-transition'] });
   reduce.addEventListener('change', start);
   compact.addEventListener('change', start);
+  mobile.addEventListener('change', start);
   start();
 }

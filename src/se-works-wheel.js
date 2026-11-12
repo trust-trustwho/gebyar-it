@@ -102,15 +102,24 @@ export function initSEWorksWheel(root, products) {
   const projectCount = project.querySelector('.se-wheel-project-count');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const compact = matchMedia('(max-width: 640px)');
+  const mobile = matchMedia('(max-width: 680px)');
   const count = products.length;
   let turn = 0, target = 0, active = -1, frame = 0, visible = false;
   let velocity = 0, previousTime = 0;
   let scrollStart = 0, scrollStep = 480;
   let metrics = null, drag = null;
+  let measuredWidth = 0, measuredHeight = 0;
 
   function measure() {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
+    if (mobile.matches && w === measuredWidth && h === measuredHeight) {
+      scrollStart = scrollY + runway.getBoundingClientRect().top;
+      requestDraw();
+      return;
+    }
+    measuredWidth = w;
+    measuredHeight = h;
     scrollStep = Math.max(480,panel.clientHeight*.78);
     runway.style.height = `${panel.clientHeight+(count+2)*scrollStep}px`;
     scrollStart = scrollY+runway.getBoundingClientRect().top;
@@ -216,6 +225,14 @@ export function initSEWorksWheel(root, products) {
   stage.addEventListener('pointermove',e => {
     if (!drag) return;
     const delta = drag.touch ? drag.x-e.clientX : drag.y-e.clientY;
+    if (mobile.matches && drag.touch && !drag.moved) {
+      const vertical = Math.abs(drag.y - e.clientY);
+      if (vertical > 8 && vertical >= Math.abs(delta)) {
+        resetGesture();
+        return;
+      }
+      if (Math.abs(delta) < 12 || Math.abs(delta) <= vertical * 1.5) return;
+    }
     if (!drag.moved && Math.abs(delta)<6) return;
     if (!drag.moved) { drag.moved=true; stage.setPointerCapture(e.pointerId); stage.classList.add('is-dragging'); }
     to(clamp(drag.start+delta/(compact.matches?230:420),0,count+1),true);
@@ -227,7 +244,7 @@ export function initSEWorksWheel(root, products) {
     const next = drag.start===0 && current>.08 ? Math.max(1,Math.round(current)) : Math.round(current);
     try { if (stage.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId); } catch (_) { /* pointer cancellation */ }
     resetGesture();
-    if (moved) to(next);
+    if (moved && !(mobile.matches && e.type === 'pointercancel')) to(next);
   };
   stage.addEventListener('pointerup',endDrag);
   stage.addEventListener('pointercancel',endDrag);
@@ -242,6 +259,16 @@ export function initSEWorksWheel(root, products) {
   });
 
   new ResizeObserver(measure).observe(stage);
+  // A late-loading section above the wheel can move its start without resizing the stage.
+  const layoutObserver = new ResizeObserver(() => {
+    if (root.classList.contains('is-active')) measure();
+  });
+  const syncMobileMeasurement = () => {
+    if (mobile.matches) layoutObserver.observe(root);
+    else layoutObserver.disconnect();
+    measure();
+  };
+  mobile.addEventListener('change', syncMobileMeasurement);
   new IntersectionObserver(entries=>{ visible=entries[0].isIntersecting; if (visible) measure(); else { resetGesture(); if(frame) cancelAnimationFrame(frame); frame=0; previousTime=0; } },{rootMargin:'100px'}).observe(stage);
   new MutationObserver(()=>{
     if (root.classList.contains('is-active')) measure();
@@ -249,5 +276,5 @@ export function initSEWorksWheel(root, products) {
   }).observe(root,{attributes:true,attributeFilter:['class']});
   reduce.addEventListener('change',()=>{ turn=target; velocity=0; requestDraw(); });
   compact.addEventListener('change',measure);
-  measure();
+  syncMobileMeasurement();
 }

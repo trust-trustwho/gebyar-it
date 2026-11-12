@@ -153,7 +153,15 @@ export function initSEBowlGlow(root) {
   const hero = root.querySelector('.se-hero-wrapper');
   const canvas = hero?.querySelector('.se-bowl-glow canvas');
   if (!canvas) return;
-  const paint = createPainter(canvas);
+  const mobile = matchMedia('(max-width: 680px)');
+  const fullWidth = canvas.width;
+  const fullHeight = canvas.height;
+  const setResolution = () => {
+    canvas.width = mobile.matches ? 64 : fullWidth;
+    canvas.height = mobile.matches ? 40 : fullHeight;
+    return createPainter(canvas);
+  };
+  let paint = mobile.matches ? setResolution() : createPainter(canvas);
   if (!paint) return;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let visible = false;
@@ -161,16 +169,18 @@ export function initSEBowlGlow(root) {
   let began = null;
   let zoomStartedAt = null;
   let lastPaint = null;
+  let lastScroll = null;
   let current = rest;
 
   const aspect = () => (canvas.clientWidth || innerWidth) / (canvas.clientHeight || innerHeight);
   function reset() {
     current = rest;
     canvas.style.transform = '';
+    lastScroll = null;
     const entering = root.dataset.seEntryTransition === 'zoom-in' && !motion.matches;
     zoomStartedAt = entering ? performance.now() : null;
     if (entering) began = zoomStartedAt - 1300;
-    paint(rest, entering ? previewAspect : aspect());
+    paint?.(rest, entering ? previewAspect : aspect());
   }
   resetters.set(root, reset);
   if (motion.matches) reset();
@@ -184,7 +194,10 @@ export function initSEBowlGlow(root) {
     const elapsed = now - began;
     // While the iris is fixed, the document still has the quiz's scroll offset.
     const scroll = transition === 'zoom-in' ? 0 : Math.max(0, -hero.getBoundingClientRect().top);
-    canvas.style.transform = `translateY(${scroll}px)`;
+    if (!mobile.matches || scroll !== lastScroll) {
+      canvas.style.transform = `translateY(${scroll}px)`;
+      lastScroll = scroll;
+    }
     if (elapsed >= 250 && (lastPaint === null || now - lastPaint >= 32)) {
       const target = targetAt(scroll / Math.max(1, hero.clientHeight));
       if (elapsed < 1300 && scroll === 0) {
@@ -197,7 +210,7 @@ export function initSEBowlGlow(root) {
       const [tip, half, soft] = current;
       const blend = zoomStartedAt === null ? 1 : smooth((now - zoomStartedAt) / 650);
       const drawAspect = mix(previewAspect, aspect(), blend);
-      paint([
+      paint?.([
         tip + Math.sin(elapsed * .00033 + 1.3) * .02 * blend,
         half + Math.sin(elapsed * .0005) * .015 * blend,
         soft,
@@ -221,6 +234,11 @@ export function initSEBowlGlow(root) {
   }).observe(hero);
   new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-se-entry-transition'] });
   motion.addEventListener('change', sync);
+  mobile.addEventListener('change', () => {
+    paint = setResolution();
+    if (visible) reset();
+    sync();
+  });
   window.addEventListener('resize', () => { if (visible && motion.matches) reset(); });
   document.addEventListener('visibilitychange', sync);
 }
