@@ -1047,6 +1047,7 @@ function activateLabView(targetLabId, pushUrl = true, { immediate = false } = {}
 
   const targetSection = document.getElementById(targetLabId);
   if (targetSection) {
+    labOpenedFromQuiz = false;
     currentActiveLab = targetLabId;
     if (headerEl) headerEl.classList.add('is-hidden');
     document.body.classList.add('in-lab-view');
@@ -2786,7 +2787,7 @@ window.addEventListener('touchend', () => {
 }, { passive: true });
 
 function handleLabScrollUpIntent(e) {
-  if (!currentActiveLab || isZoomingTransition) return;
+  if (!currentActiveLab || !labOpenedFromQuiz || isZoomingTransition) return;
   if (!['se', 'csn', 'git', 'keris'].includes(currentActiveLab)) return;
 
   const labSection = document.getElementById(currentActiveLab);
